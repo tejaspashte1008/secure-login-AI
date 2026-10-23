@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Security Alerts - SecureLogin AI{% endblock %}
+{% block page_heading %}Security Incident Alerts{% endblock %}
+{% block page_subheading %}Active theft countermeasures, lockout triggers, and dispatch history{% endblock %}
+
+{% block content %}
+<!-- Alert Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="cyber-card p-4 border-danger border-opacity-50">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-3 bg-danger bg-opacity-20 text-danger rounded-circle">
+          <i class="bi bi-shield-exclamation fs-2"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold text-white mb-1">Dual-Channel Notification Engine</h5>
+          <p class="text-secondary mb-0 small">
+            When 3 consecutive failed login attempts occur on any registered account, the application automatically triggers:
+            <span class="text-info fw-semibold">1) An SMTP Security Email</span> and
+            <span class="text-success fw-semibold">2) A Real WhatsApp Security Notice</span>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Incidents List -->
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-bell-fill text-danger me-2"></i>Triggered Security Incidents (Lockouts & Thefts)</h6>
+      
+      {% for alert in alert_events %}
+      <div class="p-3 mb-3 rounded border border-danger border-opacity-25" style="background-color: rgba(239, 68, 68, 0.05);">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="cyber-badge badge-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>THRESHOLD BREACHED</span>
+          <small class="text-secondary">{{ alert.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC') }}</small>
+        </div>
+        <div class="fw-bold text-light">Targeted Account: {{ alert.email_attempted }}</div>
+        <div class="text-secondary small mt-1">
+          <strong>Incident Summary:</strong> 3 consecutive failed attempts detected from IP <code>{{ alert.ip_address }}</code>.
+          Account automatically locked for 15 minutes.
+        </div>
+        <div class="mt-2 d-flex gap-2">
+          <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-25">
+            <i class="bi bi-envelope-check me-1"></i> SMTP Dispatched
+          </span>
+          <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25">
+            <i class="bi bi-whatsapp me-1"></i> WhatsApp Dispatched
+          </span>
+          <span class="badge bg-dark text-secondary">
+            Risk: {{ '%.2f'|format(alert.risk_score) }}
+          </span>
+        </div>
+      </div>
+      {% else %}
+      <div class="text-center text-secondary py-5">
+        <i class="bi bi-shield-check fs-1 text-success mb-2 d-block"></i>
+        <div class="fw-semibold text-white">No Critical Security Breaches Detected</div>
+        <small>When an account reaches 3 failed attempts, incidents will show here.</small>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Channel Status Card -->
+    <div class="cyber-card p-4 mb-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-broadcast text-info me-2"></i>Alert Channels Status</h6>
+      
+      <div class="mb-3 p-3 rounded bg-dark border border-secondary border-opacity-25">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold text-light"><i class="bi bi-envelope text-primary me-2"></i>SMTP Email</span>
+          {% if email_configured %}
+            <span class="badge bg-success">Configured</span>
+          {% else %}
+            <span class="badge bg-secondary">Simulated / Missing .env</span>
+          {% endif %}
+        </div>
+        <div class="small text-secondary mt-1">Sends detailed HTML & text security alerts with IP & timestamp.</div>
+      </div>
+
+      <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold text-light"><i class="bi bi-whatsapp text-success me-2"></i>WhatsApp Gateway</span>
+          {% if whatsapp_configured %}
+            <span class="badge bg-success">Configured</span>
+          {% else %}
+            <span class="badge bg-secondary">Simulated / Missing .env</span>
+          {% endif %}
+        </div>
+        <div class="small text-secondary mt-1">Sends immediate push notice via Twilio WhatsApp API or Webhook.</div>
+      </div>
+    </div>
+
+    <!-- Instructions Tip -->
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-2"><i class="bi bi-lightbulb text-warning me-2"></i>Testing Tip for Presentation</h6>
+      <p class="text-secondary small mb-0">
+        To demonstrate the live theft alert during a viva/project review:
+        <br>1. Log out or open an incognito tab.
+        <br>2. Try logging into your registered email with 3 wrong passwords.
+        <br>3. Watch the lock take effect and inspect the dispatched notifications!
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

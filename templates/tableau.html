@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}DAV Tableau Integration - SecureLogin AI{% endblock %}
+{% block page_heading %}Data Analysis & Visualization (DAV) – Tableau{% endblock %}
+{% block page_subheading %}Safe Telemetry Export, Data Dictionary, and Visualization Blueprint{% endblock %}
+
+{% block content %}
+<!-- Export Action Card -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="cyber-card p-4 border-success border-opacity-50">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="p-3 bg-success bg-opacity-20 text-success rounded-circle">
+            <i class="bi bi-file-earmark-spreadsheet-fill fs-2"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold text-white mb-1">Export Telemetry Data for Tableau Analysis</h5>
+            <p class="text-secondary mb-0 small">
+              Generates a privacy-compliant CSV containing login records, ML risk scores, and security classifications.
+              Passwords, secret hashes, and sensitive credentials are completely omitted.
+            </p>
+          </div>
+        </div>
+        <div>
+          <a href="{{ url_for('export_tableau_csv') }}" class="btn btn-cyber-primary py-2 px-3">
+            <i class="bi bi-download me-2"></i>Download Tableau Dataset (CSV)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Data Dictionary & Privacy Compliance -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="cyber-card p-4 h-100">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-table text-info me-2"></i>Exported CSV Schema (Data Dictionary)</h6>
+      <div class="table-responsive">
+        <table class="table table-cyber table-sm">
+          <thead>
+            <tr>
+              <th>Column Name</th>
+              <th>Type</th>
+              <th>Description / Privacy Rule</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>log_id</code></td>
+              <td>Integer</td>
+              <td>Unique audit identifier.</td>
+            </tr>
+            <tr>
+              <td><code>timestamp</code></td>
+              <td>Datetime</td>
+              <td>Event time in ISO 8601 UTC.</td>
+            </tr>
+            <tr>
+              <td><code>login_hour</code></td>
+              <td>Integer</td>
+              <td>Hour of day (0-23) for temporal clustering.</td>
+            </tr>
+            <tr>
+              <td><code>anonymized_user</code></td>
+              <td>String</td>
+              <td>Masked identifier (e.g. <code>te***@gmail.com</code>). Plaintext hidden.</td>
+            </tr>
+            <tr>
+              <td><code>success_flag</code></td>
+              <td>Boolean</td>
+              <td>1 = Successful login, 0 = Failed.</td>
+            </tr>
+            <tr>
+              <td><code>failed_attempt_count</code></td>
+              <td>Integer</td>
+              <td>Consecutive failed count at moment of attempt.</td>
+            </tr>
+            <tr>
+              <td><code>risk_score</code></td>
+              <td>Float</td>
+              <td>Isolation Forest anomaly score [0.00 - 1.00].</td>
+            </tr>
+            <tr>
+              <td><code>security_status</code></td>
+              <td>Category</td>
+              <td><code>SUCCESS</code>, <code>FAILED</code>, <code>SUSPICIOUS</code>, <code>BLOCKED</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="small text-danger mt-2">
+        <i class="bi bi-shield-lock-fill me-1"></i><strong>Zero-Knowledge Export:</strong> Passwords and password hashes are NEVER exported under any circumstance.
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="cyber-card p-4 h-100">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-diagram-2 text-warning me-2"></i>Tableau Connection Instructions</h6>
+      <ol class="text-secondary small ps-3 mb-0" style="line-height: 1.8;">
+        <li>Click the <strong class="text-info">Download Tableau Dataset (CSV)</strong> button above.</li>
+        <li>Open <strong>Tableau Desktop</strong> or <strong>Tableau Public</strong> on your computer.</li>
+        <li>In the left panel under <em>Connect -> To a File</em>, select <strong class="text-white">Text file</strong>.</li>
+        <li>Navigate to your Downloads folder and choose <code class="text-info">tableau_login_data.csv</code>.</li>
+        <li>In Tableau's Data Source screen:
+          <ul>
+            <li>Ensure <code>timestamp</code> is recognized as <strong class="text-white">Date & Time</strong>.</li>
+            <li>Ensure <code>risk_score</code> is recognized as a <strong class="text-white">Number (decimal)</strong>.</li>
+            <li>Ensure <code>security_status</code> is a <strong class="text-white">String / Dimension</strong>.</li>
+          </ul>
+        </li>
+        <li>Click <strong>Sheet 1</strong> to begin building your DAV dashboards!</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- Recommended Tableau Visualizations (6 Required Charts) -->
+<div class="row">
+  <div class="col-12">
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-easel text-info me-2"></i>6 Recommended Tableau Visualizations for College Project Submission</h6>
+      
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-primary">Chart 1</span>
+              <strong class="text-white">Successful vs. Failed Logins</strong>
+            </div>
+            <div class="text-secondary small">
+              <strong>Chart Type:</strong> Donut Chart / Side-by-Side Bar Chart<br>
+              <strong>Columns:</strong> <code>success_flag</code><br>
+              <strong>Rows / Marks:</strong> <code>COUNT(log_id)</code><br>
+              <strong>Purpose:</strong> Illustrates overall authentication success rate vs malicious brute force attempts.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-danger">Chart 2</span>
+              <strong class="text-white">Suspicious Attempts by Date</strong>
+            </div>
+            <div class="text-secondary small">
+              <strong>Chart Type:</strong> Line Trend Chart with Area Fill<br>
+              <strong>Columns:</strong> <code>DAY(timestamp)</code><br>
+              <strong>Rows:</strong> <code>COUNT(log_id)</code> filtered by <code>security_status = 'SUSPICIOUS'</code><br>
+              <strong>Purpose:</strong> Visualizes spikes in credential theft and attack bursts over time.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-warning text-dark">Chart 3</span>
+              <strong class="text-white">Login Attempts by Hour</strong>
+            </div>
+            <div class="text-secondary small">
+              <strong>Chart Type:</strong> Heatmap / Bar Chart<br>
+              <strong>Columns:</strong> <code>login_hour</code> (0 to 23)<br>
+              <strong>Rows:</strong> <code>security_status</code><br>
+              <strong>Color:</strong> <code>COUNT(log_id)</code><br>
+              <strong>Purpose:</strong> Detects anomalies occurring during irregular hours (e.g., 2:00 AM - 5:00 AM).
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-danger">Chart 4</span>
+              <strong class="text-white">Blocked Login Count</strong>
+            </div>
+            <div class="text-secondary small">
+              <strong>Chart Type:</strong> Bullet Graph / Single Metric KPI Card<br>
+              <strong>Measure:</strong> <code>SUM(IF security_status = 'BLOCKED' THEN 1 ELSE 0 END)</code><br>
+              <strong>Purpose:</strong> Displays the total count of malicious actors halted by the 3-attempt firewall rule.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-info text-dark">Chart 5</span>
+              <strong class="text-white">ML Risk Score Distribution</strong>
+            </div>
+            <div class="text-secondary small">
+              <strong>Chart Type:</strong> Histogram / Box-and-Whisker Plot<br>
+              <strong>Measure:</strong> <code>risk_score</code> binned into 0.1 increments<br>
+              <strong>Purpose:</strong> Demonstrates the effectiveness of the scikit-learn Isolation Forest model separation.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-success">Chart 6</span>
+              <strong class="text-white">Security Status Summary</strong>
+            </div>
+            <div class="text-secondary small">
+              <strong>Chart Type:</strong> Treemap / Stacked 100% Bar Chart<br>
+              <strong>Dimension:</strong> <code>security_status</code><br>
+              <strong>Size / Label:</strong> <code>Percentage of Total Logins</code><br>
+              <strong>Purpose:</strong> Gives executive SOC overview of system health for project panel presentation.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

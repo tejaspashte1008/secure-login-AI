@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Application Firewall - SecureLogin AI{% endblock %}
+{% block page_heading %}Application-Level Security Firewall (INS){% endblock %}
+{% block page_subheading %}Layer 7 Rule Engine, Sliding Window Rate Limiter & Lockout Policies{% endblock %}
+
+{% block content %}
+<!-- Architectural Clarification Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="cyber-card p-4 border-info border-opacity-50">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-3 bg-info bg-opacity-20 text-info rounded-circle">
+          <i class="bi bi-shield-check fs-2"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold text-white mb-1">Academic Concept: Layer 7 Application Firewall vs. Network Firewall</h5>
+          <p class="text-secondary mb-0 small">
+            <strong>Important INS Distinction:</strong> This system implements an <em>Application-Level (Layer 7) Security Firewall and Rule Engine</em>.
+            Unlike an OS packet-filtering firewall (e.g. Windows Firewall / Linux iptables) or Network Firewall (which operates at Layer 3/4 on IP headers and TCP ports),
+            an Application Firewall inspects semantic HTTP authentication payloads, prevents brute-force credential stuffing, enforces rate-limiting sliding windows,
+            and statefully locks user accounts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firewall Rules & Active Policies -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-7">
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-card-checklist text-cyan me-2"></i>Active Rule Policies</h6>
+      
+      <div class="list-group list-group-flush">
+        <div class="list-group-item bg-transparent text-light border-secondary border-opacity-25 py-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>Rule #1: Max Failed Password Threshold</strong>
+            <span class="badge bg-danger">Strict Enforcement</span>
+          </div>
+          <p class="text-secondary small mb-0">
+            If an account registers <strong>3 consecutive failed attempts</strong>, the engine halts further authentication, marks the account status as <code>BLOCKED</code>, and locks the target account for <strong>15 minutes</strong>.
+          </p>
+        </div>
+
+        <div class="list-group-item bg-transparent text-light border-secondary border-opacity-25 py-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>Rule #2: IP Sliding Window Rate Limiting</strong>
+            <span class="badge bg-warning text-dark">DDoS / Bot Throttling</span>
+          </div>
+          <p class="text-secondary small mb-0">
+            Enforces a maximum of <strong>20 requests per 60-second window</strong> per client IP address. Rapid bots or script executions are throttled with HTTP 429 status.
+          </p>
+        </div>
+
+        <div class="list-group-item bg-transparent text-light border-secondary border-opacity-25 py-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>Rule #3: Generic Authentication Responses</strong>
+            <span class="badge bg-info text-dark">Anti-Enumeration</span>
+          </div>
+          <p class="text-secondary small mb-0">
+            Prevents username/email harvesting by returning unified error responses (<code>"Invalid email or password"</code>) regardless of whether the email exists in the database.
+          </p>
+        </div>
+
+        <div class="list-group-item bg-transparent text-light border-secondary border-opacity-25 py-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>Rule #4: Session Integrity & CSRF Hardening</strong>
+            <span class="badge bg-success">Session Protection</span>
+          </div>
+          <p class="text-secondary small mb-0">
+            Cookies configured with <code>HttpOnly=True</code>, <code>SameSite=Lax</code>, and regenerated session identifiers to protect against Session Hijacking and XSS attacks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="cyber-card p-4 mb-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-speedometer2 text-warning me-2"></i>Live Firewall Telemetry</h6>
+      
+      <div class="mb-3">
+        <div class="d-flex justify-content-between text-secondary small mb-1">
+          <span>Failed Attempts Tolerance</span>
+          <span class="text-white fw-bold">3 Attempts Max</span>
+        </div>
+        <div class="progress" style="height: 6px; background-color: #334155;">
+          <div class="progress-bar bg-danger" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between text-secondary small mb-1">
+          <span>Account Lockout Duration</span>
+          <span class="text-white fw-bold">15 Minutes</span>
+        </div>
+        <div class="progress" style="height: 6px; background-color: #334155;">
+          <div class="progress-bar bg-warning" style="width: 60%;"></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between text-secondary small mb-1">
+          <span>IP Sliding Window</span>
+          <span class="text-white fw-bold">60 Seconds / 20 Reqs</span>
+        </div>
+        <div class="progress" style="height: 6px; background-color: #334155;">
+          <div class="progress-bar bg-info" style="width: 40%;"></div>
+        </div>
+      </div>
+
+      <div class="p-3 bg-dark rounded border border-secondary border-opacity-25 mt-4">
+        <div class="small text-secondary">Current Client Request IP:</div>
+        <div class="fw-bold text-white fs-6"><code>{{ client_ip }}</code></div>
+      </div>
+    </div>
+
+    <!-- Quick Unblock Helper for Students -->
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-2"><i class="bi bi-arrow-counterclockwise text-success me-2"></i>Lab Admin Reset Utility</h6>
+      <p class="text-secondary small mb-3">
+        In case you locked your test user during demonstration, click below to safely reset all lockout timers and failed attempt counters.
+      </p>
+      <form method="POST" action="{{ url_for('reset_lockouts') }}">
+        <button type="submit" class="btn btn-sm btn-outline-warning w-100">
+          <i class="bi bi-unlock-fill me-1"></i> Reset All Locked Accounts (Demo Mode)
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

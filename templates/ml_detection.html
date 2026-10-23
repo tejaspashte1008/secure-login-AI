@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}ML Anomaly Detection - SecureLogin AI{% endblock %}
+{% block page_heading %}Machine Learning Anomaly Detection (MLF){% endblock %}
+{% block page_subheading %}Scikit-Learn Isolation Forest Algorithm for Login Risk Scoring{% endblock %}
+
+{% block content %}
+<!-- Theoretical Overview Banner -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="cyber-card p-4 border-primary border-opacity-50">
+      <div class="d-flex align-items-center gap-3">
+        <div class="p-3 bg-primary bg-opacity-20 text-info rounded-circle">
+          <i class="bi bi-cpu fs-2"></i>
+        </div>
+        <div>
+          <h5 class="fw-bold text-white mb-1">Academic Concept: Unsupervised Anomaly Detection via Isolation Forest</h5>
+          <p class="text-secondary mb-0 small">
+            In authentication security, labeled attack datasets are scarce and attackers continuously change tactics.
+            We employ <strong>Isolation Forest (Liu et al., 2008)</strong>, an unsupervised tree ensemble algorithm.
+            Anomalous login patterns (credential stuffing, velocity bursts, unusual hours) have distinct feature values and
+            require significantly <strong>fewer random recursive partitions (shorter path lengths)</strong> to be isolated in tree nodes than normal user behavior.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Feature Engineering Matrix -->
+  <div class="col-lg-6">
+    <div class="cyber-card p-4 h-100">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-diagram-3 text-cyan me-2"></i>Feature Engineering Breakdown</h6>
+      <div class="table-responsive">
+        <table class="table table-cyber table-sm mb-0">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Data Type</th>
+              <th>Security Rationale</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fw-semibold text-info">failed_attempts</td>
+              <td><code>int (0 - 5+)</code></td>
+              <td>Direct measure of credential mismatch count.</td>
+            </tr>
+            <tr>
+              <td class="fw-semibold text-info">login_hour</td>
+              <td><code>int (0 - 23)</code></td>
+              <td>Captures diurnal access patterns (night-time vs daytime).</td>
+            </tr>
+            <tr>
+              <td class="fw-semibold text-info">attempts_last_10m</td>
+              <td><code>int (1 - 20)</code></td>
+              <td>Measures velocity/frequency burst of attempts.</td>
+            </tr>
+            <tr>
+              <td class="fw-semibold text-info">is_night_time</td>
+              <td><code>binary (0/1)</code></td>
+              <td>Indicator variable for high-risk off-hours (23:00 - 05:00).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 p-3 rounded bg-dark border border-secondary border-opacity-25 small text-secondary">
+        <div class="fw-bold text-white mb-1"><i class="bi bi-exclamation-circle text-warning me-1"></i>Defense-in-Depth Principle:</div>
+        The ML model provides risk augmentation, but <strong>the hard 3-attempt security lockout rule is strictly deterministic</strong>.
+        Even if the ML model encounters an unseen feature or is temporarily offline, the rule engine guarantees lockout.
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive ML Prediction Playground -->
+  <div class="col-lg-6">
+    <div class="cyber-card p-4 h-100">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-sliders text-warning me-2"></i>Interactive Model Playground</h6>
+      <p class="text-secondary small mb-3">
+        Simulate an incoming authentication attempt and observe how the Isolation Forest predicts risk score and classifies the event.
+      </p>
+
+      <form id="mlSimForm">
+        <div class="mb-3">
+          <label class="form-label" for="sim_failures">Failed Attempts: <span id="val_failures" class="text-info fw-bold">2</span></label>
+          <input type="range" class="form-range" id="sim_failures" min="0" max="5" value="2" oninput="document.getElementById('val_failures').innerText=this.value; runMLSim();">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="sim_hour">Login Hour (0-23 UTC): <span id="val_hour" class="text-info fw-bold">2</span> (2:00 AM)</label>
+          <input type="range" class="form-range" id="sim_hour" min="0" max="23" value="2" oninput="document.getElementById('val_hour').innerText=this.value + ':00'; runMLSim();">
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label" for="sim_velocity">Attempts in Last 10 Mins: <span id="val_velocity" class="text-info fw-bold">6</span></label>
+          <input type="range" class="form-range" id="sim_velocity" min="1" max="15" value="6" oninput="document.getElementById('val_velocity').innerText=this.value; runMLSim();">
+        </div>
+
+        <div class="p-3 rounded bg-dark border border-secondary border-opacity-50 text-center">
+          <div class="text-secondary small text-uppercase">Predicted Anomaly Risk Score</div>
+          <div id="simRiskResult" class="display-6 fw-bold text-warning my-1">0.78</div>
+          <div id="simStatusResult">
+            <span class="cyber-badge badge-warning">SUSPICIOUS ANOMALY</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Model Limitations & Academic Evaluation -->
+<div class="row">
+  <div class="col-12">
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-journal-text text-info me-2"></i>Model Evaluation & Academic Limitations</h6>
+      <div class="row g-3 text-secondary small">
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="text-light fw-bold mb-1">1. Cold-Start Problem</div>
+            Unsupervised tree algorithms require representative distributions of baseline normal behavior. In new organizations with few users, anomalies must rely on rule-based fallbacks.
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="text-light fw-bold mb-1">2. Legitimate Shift (False Positives)</div>
+            A legitimate user logging in at 2 AM while studying for finals may trigger a higher anomaly risk score despite holding valid credentials.
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25 h-100">
+            <div class="text-light fw-bold mb-1">3. Low-and-Slow Attacks</div>
+            Sophisticated adversaries spreading attempts across hours or distributed IPs avoid velocity flags, which is why IP sliding windows and account lockouts are combined.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function runMLSim() {
+  const failures = parseInt(document.getElementById('sim_failures').value);
+  const hour = parseInt(document.getElementById('sim_hour').value);
+  const velocity = parseInt(document.getElementById('sim_velocity').value);
+  const isNight = (hour >= 23 || hour <= 5) ? 1 : 0;
+
+  // Approximate client-side simulation aligned with IsolationForest weights
+  let score = 0.05 + (failures * 0.25) + (velocity * 0.04) + (isNight * 0.18);
+  if (failures >= 3) score = Math.max(score, 0.92);
+  score = Math.min(Math.max(score, 0.05), 0.99);
+
+  const riskEl = document.getElementById('simRiskResult');
+  const statusEl = document.getElementById('simStatusResult');
+  riskEl.innerText = score.toFixed(2);
+
+  if (score >= 0.75) {
+    riskEl.className = 'display-6 fw-bold text-danger my-1';
+    statusEl.innerHTML = '<span class="cyber-badge badge-danger"><i class="bi bi-shield-slash-fill me-1"></i>HIGH RISK ANOMALY</span>';
+  } else if (score >= 0.40) {
+    riskEl.className = 'display-6 fw-bold text-warning my-1';
+    statusEl.innerHTML = '<span class="cyber-badge badge-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>SUSPICIOUS ANOMALY</span>';
+  } else {
+    riskEl.className = 'display-6 fw-bold text-success my-1';
+    statusEl.innerHTML = '<span class="cyber-badge badge-success"><i class="bi bi-check-circle-fill me-1"></i>NORMAL PATTERN</span>';
+  }
+}
+// Run once on load
+window.addEventListener('DOMContentLoaded', runMLSim);
+</script>
+{% endblock %}

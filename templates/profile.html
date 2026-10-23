@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile - SecureLogin AI{% endblock %}
+{% block page_heading %}User Profile & Security Settings{% endblock %}
+{% block page_subheading %}Registered notification endpoints and credential security status{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-5">
+    <div class="cyber-card p-4">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle p-3 mb-2">
+          <i class="bi bi-person-circle fs-1 text-info"></i>
+        </div>
+        <h4 class="fw-bold text-white mb-0">{{ user.full_name }}</h4>
+        <small class="text-info">{{ user.email }}</small>
+        <div class="mt-2">
+          <span class="cyber-badge badge-success"><i class="bi bi-shield-check me-1"></i>Active Protected Account</span>
+        </div>
+      </div>
+
+      <div class="border-top border-secondary border-opacity-25 pt-3">
+        <div class="mb-3">
+          <div class="stat-label">Registered WhatsApp Number</div>
+          <div class="fw-semibold text-white fs-6">
+            <i class="bi bi-whatsapp text-success me-2"></i>{{ user.whatsapp_number }}
+          </div>
+          <small class="text-secondary" style="font-size: 0.72rem;">Configured to receive real alerts upon 3 failed attempts.</small>
+        </div>
+
+        <div class="mb-3">
+          <div class="stat-label">Member Since</div>
+          <div class="text-light">{{ user.created_at.strftime('%B %d, %Y (%H:%M UTC)') }}</div>
+        </div>
+
+        <div class="mb-3">
+          <div class="stat-label">Current Failed Attempts Counter</div>
+          <div>
+            {% if user.failed_attempts == 0 %}
+              <span class="badge bg-success bg-opacity-25 text-success">0 Failed Attempts (Safe)</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">{{ user.failed_attempts }} Failed Attempts</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div>
+          <div class="stat-label">Lockout Status</div>
+          <div>
+            {% if user.is_locked() %}
+              <span class="badge bg-danger">Locked for {{ user.get_remaining_lockout_minutes() }} mins</span>
+            {% else %}
+              <span class="badge bg-success bg-opacity-25 text-success">Unlocked / Nominal</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="cyber-card p-4 mb-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-bell-ring text-warning me-2"></i>Test Security Notification Channels</h6>
+      <p class="text-secondary small mb-3">
+        Verify that your SMTP and WhatsApp API keys in <code>.env</code> are properly configured.
+        Click below to dispatch a mock security test alert to your registered email and WhatsApp.
+      </p>
+
+      <div class="d-flex flex-wrap gap-2">
+        <form method="POST" action="{{ url_for('test_email_dispatch') }}">
+          <button type="submit" class="btn btn-sm btn-outline-info">
+            <i class="bi bi-envelope-check me-1"></i> Send Test Security Email
+          </button>
+        </form>
+
+        <form method="POST" action="{{ url_for('test_whatsapp_dispatch') }}">
+          <button type="submit" class="btn btn-sm btn-outline-success">
+            <i class="bi bi-whatsapp me-1"></i> Send Test WhatsApp Alert
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="cyber-card p-4">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-shield-lock text-cyan me-2"></i>Storage Integrity Guarantee</h6>
+      <ul class="text-secondary small ps-3 mb-0" style="line-height: 1.8;">
+        <li>Passwords are never stored in plaintext. They are hashed using <code>scrypt</code> with cryptographic salts.</li>
+        <li>Even system administrators cannot view your raw password.</li>
+        <li>Audit logs only record authentication timestamps, originating IP addresses, and scikit-learn risk scores.</li>
+        <li>Tableau CSV export strips all personal identifiers and password hashes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

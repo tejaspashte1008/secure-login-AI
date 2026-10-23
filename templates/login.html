@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Login - SecureLogin AI{% endblock %}
+
+{% block public_content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <!-- Security Shield Header -->
+    <div class="text-center mb-4">
+      <div class="d-inline-flex align-items-center justify-content-center bg-cyan bg-opacity-10 text-info rounded-circle p-3 mb-2" style="background-color: rgba(6, 182, 212, 0.12);">
+        <i class="bi bi-shield-shaded fs-1 text-info"></i>
+      </div>
+      <h3 class="fw-bold text-white mb-1">SecureLogin AI</h3>
+      <p class="text-secondary small">Intelligent Login Theft Detection & SOC Firewall</p>
+    </div>
+
+    <!-- Security Policy Banner -->
+    <div class="card bg-dark border-secondary border-opacity-50 mb-3 text-secondary p-2 small text-center">
+      <div><i class="bi bi-shield-check text-success me-1"></i> <strong>Protection Active:</strong> 3 Failed Attempts Trigger Security Alerts. Entering Correct Password Unlocks Immediately.</div>
+    </div>
+
+    <!-- Login Form Card -->
+    <div class="cyber-card p-4">
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="mb-3">
+          <label class="form-label" for="email">Account Email</label>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-envelope"></i></span>
+            <input type="email" class="form-control" id="email" name="email" placeholder="student@college.edu" required autofocus>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="form-label" for="password">Password</label>
+            <span class="text-secondary small" style="font-size: 0.72rem;">Encrypted & Hashed</span>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-lock"></i></span>
+            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-cyber-primary w-100 py-2 mb-3">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Authenticate & Verify
+        </button>
+
+        <div class="text-center text-secondary small">
+          New user? <a href="{{ url_for('register') }}" class="text-info text-decoration-none fw-semibold">Register college account</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Defense Architecture Notice -->
+    <div class="mt-4 text-center text-secondary" style="font-size: 0.75rem;">
+      <div>Layer 7 Application Firewall • Isolation Forest ML Risk Engine</div>
+      <div class="text-muted mt-1">DAV/Tableau Analytics Pipeline Ready</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
